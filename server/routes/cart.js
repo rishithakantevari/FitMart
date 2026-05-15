@@ -3,6 +3,8 @@ const router = express.Router();
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const verifyFirebaseToken = require('../middleware/verifyFirebaseToken');
+const validateRequest = require('../middleware/validateRequest');
+const { cartAddSchema, cartRemoveSchema } = require('../validation/requestSchemas');
 
 // Helper: adjust product reserved count
 async function adjustReserved(productId, delta) {
@@ -47,7 +49,7 @@ router.get('/:userId', verifyFirebaseToken, async (req, res) => {
  * @desc    Add an item to the user's cart and reserve stock; body: { productId, quantity }
  * @access  Private
  */
-router.post('/:userId/add', verifyFirebaseToken, async (req, res) => {
+router.post('/:userId/add', verifyFirebaseToken, validateRequest(cartAddSchema), async (req, res) => {
   if (!checkOwnership(req, res)) return;
 
   try {
@@ -89,7 +91,7 @@ router.post('/:userId/add', verifyFirebaseToken, async (req, res) => {
  * @desc    Remove an item (or reduce its quantity) from the user's cart and release reserved stock; body: { productId, quantity }
  * @access  Private
  */
-router.post('/:userId/remove', verifyFirebaseToken, async (req, res) => {
+router.post('/:userId/remove', verifyFirebaseToken, validateRequest(cartRemoveSchema), async (req, res) => {
   if (!checkOwnership(req, res)) return;
 
   try {

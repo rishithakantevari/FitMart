@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const verifyFirebaseToken = require('../middleware/verifyFirebaseToken');
+const validateRequest = require('../middleware/validateRequest');
+const { createOrderSchema } = require('../validation/requestSchemas');
 const { createOrder } = require('../services/orderService');
 
 /**
@@ -11,7 +13,7 @@ const { createOrder } = require('../services/orderService');
  *          body: { userId, items?: [{ productId, quantity }] }
  * @access  Private
  */
-router.post('/', verifyFirebaseToken, async (req, res) => {
+router.post('/', verifyFirebaseToken, validateRequest(createOrderSchema), async (req, res) => {
   const { userId, items } = req.body;
 
   if (!userId) return res.status(400).json({ error: 'userId required' });
