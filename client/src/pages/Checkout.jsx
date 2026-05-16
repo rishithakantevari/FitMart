@@ -20,7 +20,6 @@ export default function Checkout() {
   const [profile, setProfile] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [addressError, setAddressError] = useState(false);
 
   useEffect(() => { document.title = "My Cart - FitMart"; }, []);
 
@@ -81,12 +80,6 @@ export default function Checkout() {
   const total = subtotal - discountAmt;
 
   const handleProceed = () => {
-    if (!selectedAddress) {
-      setAddressError(true);
-      return;
-    }
-    
-    setAddressError(false);
     navigate("/payment", {
       state: {
         items, total, subtotal, discountAmt,
@@ -186,27 +179,22 @@ export default function Checkout() {
                   </span>
                 </div>
               </div>
-              {addressError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
-                  <p className="text-red-700 text-xs font-medium">⚠ No shipping address selected</p>
-                  <p className="text-red-600 text-xs mt-1">Please add or select an address in your profile before proceeding.</p>
-                  <button 
-                    onClick={() => navigate('/profile')}
-                    className="text-red-700 underline text-xs mt-2 font-medium hover:text-red-800"
-                  >
-                    Go to Profile →
-                  </button>
-                </div>
+
+              {/* Persistent error message when no address is selected */}
+              {!selectedAddress && (
+                <p className="text-xs text-red-500 mt-2 mb-2">
+                  Please <button onClick={() => navigate('/profile')} className="underline cursor-pointer">Add a Shipping Address</button> to continue.
+                </p>
               )}
+
               <button
                 onClick={handleProceed}
                 disabled={!selectedAddress}
                 className={`w-full text-sm px-8 py-3.5 rounded-full
-                           transition-colors font-medium min-h-12 ${
-                  selectedAddress 
-                    ? 'bg-white text-stone-900 hover:bg-stone-100' 
+                           transition-colors font-medium min-h-12 ${selectedAddress
+                    ? 'bg-white text-stone-900 hover:bg-stone-100'
                     : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 Proceed to Payment →
               </button>
