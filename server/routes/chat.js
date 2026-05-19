@@ -16,7 +16,7 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Gemini Config
-const modelName = process.env.GEMINI_MODEL_NAME
+const modelName = process.env.GEMINI_MODEL_NAME || "gemini-2.5-flash";
 const model = genAI.getGenerativeModel({ model: modelName });
 
 const PRODUCT_KEYWORDS = ["protein", "supplement", "muscle", "gain", "whey", "creatine", "mass"];
