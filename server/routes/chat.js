@@ -1,9 +1,20 @@
 // server/routes/chat.js
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require("@google/generative-ai");
 const Product = require("../models/Product");
 const router = express.Router();
 
+// Rate Limiter 
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: {
+    error: "Too many requests, please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 // Debug: Check if API key is loaded
 console.log("API Key exists:", !!process.env.GEMINI_API_KEY);
 console.log("API Key prefix:", process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 15) + "..." : "MISSING");
@@ -49,7 +60,7 @@ const getFallbackResponse = (message) => {
   }
 };
 
-router.post("/", async (req, res) => {
+router.post("/", chatLimiter,async (req, res) => {
   try {
     const { message } = req.body;
     if (!message?.trim()) {
